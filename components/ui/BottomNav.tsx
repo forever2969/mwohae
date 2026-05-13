@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { useNavigationStore } from '@/store/navigationStore'
 
 const navItems = [
   {
@@ -15,11 +17,7 @@ const navItems = [
           strokeWidth="1.8"
           fill={active ? '#FFE8F0' : 'none'}
         />
-        <path
-          d="M9 21V12h6v9"
-          stroke={active ? '#FF6B9D' : '#C7C7CC'}
-          strokeWidth="1.8"
-        />
+        <path d="M9 21V12h6v9" stroke={active ? '#FF6B9D' : '#C7C7CC'} strokeWidth="1.8" />
       </svg>
     ),
   },
@@ -42,17 +40,12 @@ const navItems = [
     label: '기록',
     icon: (active: boolean) => (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <rect
-          x="3" y="4" width="18" height="18" rx="3"
-          stroke={active ? '#FF6B9D' : '#C7C7CC'}
-          strokeWidth="1.8"
+        <rect x="3" y="4" width="18" height="18" rx="3"
+          stroke={active ? '#FF6B9D' : '#C7C7CC'} strokeWidth="1.8"
           fill={active ? '#FFE8F0' : 'none'}
         />
-        <path
-          d="M8 2v4M16 2v4M3 10h18"
-          stroke={active ? '#FF6B9D' : '#C7C7CC'}
-          strokeWidth="1.8"
-          strokeLinecap="round"
+        <path d="M8 2v4M16 2v4M3 10h18"
+          stroke={active ? '#FF6B9D' : '#C7C7CC'} strokeWidth="1.8" strokeLinecap="round"
         />
         <circle cx="8" cy="15" r="1" fill={active ? '#FF6B9D' : '#C7C7CC'} />
         <circle cx="12" cy="15" r="1" fill={active ? '#FF6B9D' : '#C7C7CC'} />
@@ -65,17 +58,12 @@ const navItems = [
     label: '프로필',
     icon: (active: boolean) => (
       <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <circle
-          cx="12" cy="8" r="4"
-          stroke={active ? '#FF6B9D' : '#C7C7CC'}
-          strokeWidth="1.8"
+        <circle cx="12" cy="8" r="4"
+          stroke={active ? '#FF6B9D' : '#C7C7CC'} strokeWidth="1.8"
           fill={active ? '#FFE8F0' : 'none'}
         />
-        <path
-          d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-          stroke={active ? '#FF6B9D' : '#C7C7CC'}
-          strokeWidth="1.8"
-          strokeLinecap="round"
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+          stroke={active ? '#FF6B9D' : '#C7C7CC'} strokeWidth="1.8" strokeLinecap="round"
         />
       </svg>
     ),
@@ -84,6 +72,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname()
+  const { startNavigation } = useNavigationStore()
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-[#F2F2F7] pb-safe z-40">
@@ -91,20 +80,18 @@ export function BottomNav() {
         {navItems.map(({ href, label, icon }) => {
           const active = pathname.startsWith(href)
           return (
-            <Link
-              key={href}
-              href={href}
-              className="flex flex-col items-center gap-1 px-4 py-1"
-            >
-              {icon(active)}
-              <span
-                className={`text-[10px] font-medium ${
-                  active ? 'text-[#FF6B9D]' : 'text-[#C7C7CC]'
-                }`}
+            <motion.div key={href} whileTap={{ scale: 0.8 }} transition={{ duration: 0.1 }}>
+              <Link
+                href={href}
+                onClick={() => { if (!active) startNavigation() }}
+                className="flex flex-col items-center gap-1 px-4 py-2"
               >
-                {label}
-              </span>
-            </Link>
+                {icon(active)}
+                <span className={`text-[10px] font-medium ${active ? 'text-[#FF6B9D]' : 'text-[#C7C7CC]'}`}>
+                  {label}
+                </span>
+              </Link>
+            </motion.div>
           )
         })}
       </div>
