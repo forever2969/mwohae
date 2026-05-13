@@ -16,11 +16,15 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: '오늘은 뭐해?',
-    startupImage: '/icons/icon-512x512.png',
   },
   icons: {
-    icon: '/icons/icon-192x192.png',
-    apple: '/icons/icon-192x192.png',
+    icon: [
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 }
 
