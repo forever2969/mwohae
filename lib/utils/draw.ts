@@ -80,7 +80,6 @@ export function calculateDraw(session: DateSession, couple: Couple): DrawResult 
         updates: {
           dinner,
           title,
-          current_step: 8,
           current_turn: null,
           status: 'completed',
           completed_at: new Date().toISOString(),
