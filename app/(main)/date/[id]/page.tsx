@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Confetti } from '@/components/ui/Confetti'
 import { DrawSlot } from '@/components/draw/DrawSlot'
 import { calculateDraw, type DrawResult } from '@/lib/utils/draw'
+import { PhotoUpload } from '@/components/date/PhotoUpload'
 import { formatDate } from '@/lib/utils/date'
 import { SUBWAY_LINES } from '@/lib/data/subway'
 
@@ -315,6 +316,8 @@ function CompletedView({ session }: { session: ReturnType<typeof useDate>['sessi
           <h1 className="text-2xl font-bold text-[#1C1C1E]">데이트 코스 완성!</h1>
           <p className="text-[#8E8E93] text-sm">{session.title}</p>
         </motion.div>
+
+        <PhotoUpload sessionId={session.id} initialPhotoUrl={session.photo_url ?? null} />
 
         <div className="bg-white rounded-3xl border border-[#F2F2F7] overflow-hidden shadow-sm">
           {items.map(({ label, value }, i) => (

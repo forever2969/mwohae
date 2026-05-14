@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { SUBWAY_LINES } from '@/lib/data/subway'
 import type { DateSession } from '@/types'
 
@@ -55,34 +56,55 @@ export function DateHistoryList({ sessions }: Props) {
           >
             <Link href={`/date/${s.id}`}>
               <div className="bg-white rounded-3xl border border-[#F2F2F7] shadow-sm overflow-hidden active:scale-[0.98] transition-transform">
-                {/* 상단: 호선 색상 바 + 날짜 */}
-                <div
-                  className="h-1.5 w-full"
-                  style={{ backgroundColor: lineData?.color ?? '#FF6B9D' }}
-                />
-                <div className="px-5 pt-4 pb-5 flex flex-col gap-4">
-                  {/* 제목 행 */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex flex-col gap-0.5">
-                      <h3 className="font-bold text-[#1C1C1E] text-base">
-                        {s.station_name}역 데이트
-                      </h3>
-                      <p className="text-xs text-[#8E8E93]">{formatKo(s.date)}</p>
+                {/* 사진 있으면 히어로 이미지 */}
+                {s.photo_url ? (
+                  <div className="relative w-full h-44">
+                    <Image
+                      src={s.photo_url}
+                      alt={`${s.station_name}역 데이트`}
+                      fill
+                      className="object-cover"
+                    />
+                    {/* 호선 배지 + 날짜 오버레이 */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                      <div>
+                        <p className="text-white font-bold text-base drop-shadow">{s.station_name}역 데이트</p>
+                        <p className="text-white/80 text-xs">{formatKo(s.date)}</p>
+                      </div>
+                      {lineData && (
+                        <span
+                          className="text-xs font-bold px-2.5 py-1 rounded-full text-white shadow"
+                          style={{ backgroundColor: lineData.color }}
+                        >
+                          {lineData.line}호선
+                        </span>
+                      )}
                     </div>
-                    {lineData && (
-                      <span
-                        className="text-xs font-bold px-2.5 py-1 rounded-full text-white"
-                        style={{ backgroundColor: lineData.color }}
-                      >
-                        {lineData.line}호선
-                      </span>
-                    )}
                   </div>
+                ) : (
+                  /* 사진 없으면 기존 색상 바 + 헤더 */
+                  <>
+                    <div className="h-1.5 w-full" style={{ backgroundColor: lineData?.color ?? '#FF6B9D' }} />
+                    <div className="px-5 pt-4 pb-0 flex items-start justify-between">
+                      <div className="flex flex-col gap-0.5">
+                        <h3 className="font-bold text-[#1C1C1E] text-base">{s.station_name}역 데이트</h3>
+                        <p className="text-xs text-[#8E8E93]">{formatKo(s.date)} · {directionLabel}</p>
+                      </div>
+                      {lineData && (
+                        <span
+                          className="text-xs font-bold px-2.5 py-1 rounded-full text-white mt-1"
+                          style={{ backgroundColor: lineData.color }}
+                        >
+                          {lineData.line}호선
+                        </span>
+                      )}
+                    </div>
+                  </>
+                )}
 
-                  {/* 방향 */}
-                  <p className="text-xs text-[#8E8E93] -mt-2">{directionLabel}</p>
-
-                  {/* 아이템 그리드 */}
+                {/* 아이템 그리드 */}
+                <div className="px-5 pt-3 pb-5">
                   <div className="grid grid-cols-2 gap-2">
                     {ITEM_ROWS.map(({ key, label }) =>
                       s[key] ? (

@@ -39,6 +39,7 @@ export interface DateSession {
   status: DateSessionStatus
   created_at: string
   completed_at: string | null
+  photo_url: string | null
 }
 
 // 뽑기 단계 순서
