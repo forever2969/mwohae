@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRealtimeCouple } from '@/hooks/useRealtime'
+import { sendPushNotification } from '@/lib/utils/notify'
 import type { Couple, Profile } from '@/types'
 
 interface UseCoupleReturn {
@@ -119,6 +120,14 @@ export function useCouple(): UseCoupleReturn {
     })
 
     if (insertError) throw new Error('커플 신청에 실패했어요')
+
+    await sendPushNotification({
+      targetUserId: target.id,
+      title: '💌 커플 신청이 왔어요!',
+      body: `${myProfile?.kakao_nickname ?? '누군가'}가 커플 신청을 보냈어요`,
+      url: '/couple',
+    })
+
     await fetchData()
   }
 
@@ -129,6 +138,14 @@ export function useCouple(): UseCoupleReturn {
       .update({ status: 'accepted', accepted_at: new Date().toISOString() })
       .eq('id', couple.id)
     if (error) throw new Error('수락에 실패했어요')
+
+    await sendPushNotification({
+      targetUserId: couple.requester_id,
+      title: '💗 커플 신청이 수락됐어요!',
+      body: `${myProfile?.kakao_nickname ?? '상대방'}이 커플을 수락했어요`,
+      url: '/couple',
+    })
+
     await fetchData()
   }
 

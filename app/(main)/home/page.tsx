@@ -97,7 +97,12 @@ export default async function HomePage() {
           <div className="bg-gradient-to-br from-[#FF6B9D] to-[#FF8E53] rounded-3xl p-6 text-white shadow-md shadow-[#FF6B9D]/30">
             <p className="text-sm font-medium opacity-80 mb-1">오늘은 어디로 갈까요?</p>
             <h2 className="text-2xl font-bold mb-5">데이트 코스 뽑기</h2>
-            <StartDateButton coupleId={couple.id} userId={user.id} />
+            <StartDateButton
+              coupleId={couple.id}
+              userId={user.id}
+              partnerId={couple.requester_id === user.id ? couple.receiver_id : couple.requester_id}
+              myName={profile?.kakao_nickname ?? undefined}
+            />
           </div>
 
           {/* 최근 데이트 기록 */}

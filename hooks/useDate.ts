@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRealtimeSession } from '@/hooks/useRealtime'
+import { sendPushNotification } from '@/lib/utils/notify'
 import type { Couple, DateSession, Profile } from '@/types'
 
 interface UseDateReturn {
@@ -88,6 +89,26 @@ export function useDate(sessionId: string): UseDateReturn {
         .eq('id', sessionId)
       if (updateError) throw updateError
       await fetchSession()
+
+      if (!couple || !myIdRef.current) return
+      const partnerId = couple.requester_id === myIdRef.current ? couple.receiver_id : couple.requester_id
+      const myName = myProfile?.kakao_nickname ?? '상대방'
+
+      if (updates.status === 'completed') {
+        await sendPushNotification({
+          targetUserId: partnerId,
+          title: '🎉 데이트 코스 완성!',
+          body: `${myName}이 마지막 뽑기를 완료했어요`,
+          url: `/date/${sessionId}`,
+        })
+      } else if (updates.current_turn === partnerId) {
+        await sendPushNotification({
+          targetUserId: partnerId,
+          title: '🎲 뽑기 차례예요!',
+          body: `${myName}이 뽑았어요. 이제 당신 차례예요`,
+          url: `/date/${sessionId}`,
+        })
+      }
     } catch {
       setError('저장 중 오류가 발생했어요')
     } finally {

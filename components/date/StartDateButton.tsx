@@ -3,13 +3,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { sendPushNotification } from '@/lib/utils/notify'
 
 interface StartDateButtonProps {
   coupleId: string
   userId: string
+  partnerId?: string
+  myName?: string
 }
 
-export function StartDateButton({ coupleId, userId }: StartDateButtonProps) {
+export function StartDateButton({ coupleId, userId, partnerId, myName }: StartDateButtonProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -42,6 +45,16 @@ export function StartDateButton({ coupleId, userId }: StartDateButtonProps) {
         .single()
 
       if (error || !session) throw error
+
+      if (partnerId) {
+        await sendPushNotification({
+          targetUserId: partnerId,
+          title: '💑 데이트 시작!',
+          body: `${myName ?? '상대방'}이 새 데이트를 시작했어요`,
+          url: `/date/${session.id}`,
+        })
+      }
+
       router.push(`/date/${session.id}`)
     } catch (e) {
       console.error(e)
