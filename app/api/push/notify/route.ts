@@ -1,5 +1,6 @@
 import webpush from 'web-push'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 webpush.setVapidDetails(
@@ -15,6 +16,14 @@ export interface PushPayload {
   url?: string
 }
 
+// 서비스 롤 클라이언트 — RLS 우회하여 다른 유저 구독 조회
+function createAdmin() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
 export async function POST(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -22,7 +31,8 @@ export async function POST(request: Request) {
 
   const { targetUserId, title, body, url } = (await request.json()) as PushPayload
 
-  const { data: subs } = await supabase
+  const admin = createAdmin()
+  const { data: subs } = await admin
     .from('push_subscriptions')
     .select('endpoint, p256dh, auth')
     .eq('user_id', targetUserId)
@@ -48,7 +58,7 @@ export async function POST(request: Request) {
       })
       .map((s) => s.endpoint)
 
-    await supabase
+    await admin
       .from('push_subscriptions')
       .delete()
       .in('endpoint', expiredEndpoints)
