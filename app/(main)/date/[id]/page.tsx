@@ -279,6 +279,7 @@ function WaitingPulse() {
 
 function CompletedView({ session }: { session: ReturnType<typeof useDate>['session'] }) {
   const [showConfetti, setShowConfetti] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => setShowConfetti(true), 200)
@@ -295,6 +296,28 @@ function CompletedView({ session }: { session: ReturnType<typeof useDate>['sessi
     { label: '🎮 오후 활동', value: session.activity! },
     { label: '🌙 저녁', value: session.dinner! },
   ]
+
+  async function handleShare() {
+    const text = [
+      `💑 ${session!.title}`,
+      ``,
+      `📍 ${session!.station_name}역`,
+      `🍽️ 점심  ${session!.lunch}`,
+      `🍰 디저트  ${session!.dessert}`,
+      `🎮 오후  ${session!.activity}`,
+      `🌙 저녁  ${session!.dinner}`,
+      ``,
+      `오늘은 뭐해? 앱으로 뽑은 데이트 코스예요 💗`,
+    ].join('\n')
+
+    if (navigator.share) {
+      await navigator.share({ text }).catch(() => {})
+    } else {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   return (
     <>
@@ -342,15 +365,22 @@ function CompletedView({ session }: { session: ReturnType<typeof useDate>['sessi
           transition={{ duration: 0.3, delay: 0.8 }}
           className="flex flex-col gap-3"
         >
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            onClick={handleShare}
+            className="flex items-center justify-center gap-2 h-14 bg-[#FF6B9D] text-white font-bold rounded-2xl shadow-sm shadow-[#FF6B9D]/30"
+          >
+            {copied ? '✓ 복사됐어요!' : '💌 결과 공유하기'}
+          </motion.button>
           <Link
             href="/home"
-            className="flex items-center justify-center h-14 bg-[#FF6B9D] text-white font-bold rounded-2xl shadow-sm shadow-[#FF6B9D]/30 active:scale-[0.97] transition-transform"
+            className="flex items-center justify-center h-12 bg-white border border-[#F2F2F7] text-[#1C1C1E] font-semibold rounded-2xl active:scale-[0.97] transition-transform"
           >
             홈으로 돌아가기
           </Link>
           <Link
             href="/date/history"
-            className="flex items-center justify-center h-12 text-[#8E8E93] text-sm font-medium active:opacity-60 transition-opacity"
+            className="flex items-center justify-center h-11 text-[#8E8E93] text-sm font-medium active:opacity-60 transition-opacity"
           >
             데이트 기록 보기
           </Link>

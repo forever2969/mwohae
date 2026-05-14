@@ -6,16 +6,18 @@ import { motion } from 'framer-motion'
 import { useCouple } from '@/hooks/useCouple'
 import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
+import { Modal } from '@/components/ui/Modal'
 import { HeartParticles } from '@/components/ui/HeartParticles'
 
 export default function CouplePage() {
-  const { couple, partner, myProfile, loading, sendRequest, acceptRequest, rejectRequest, cancelRequest } =
+  const { couple, partner, myProfile, loading, sendRequest, acceptRequest, rejectRequest, cancelRequest, dissolveCouple } =
     useCouple()
   const [code, setCode] = useState('')
   const [actionLoading, setActionLoading] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
   const [copied, setCopied] = useState(false)
   const [showHearts, setShowHearts] = useState(false)
+  const [showDissolveModal, setShowDissolveModal] = useState(false)
 
   function showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
     setToast({ message, type })
@@ -53,7 +55,42 @@ export default function CouplePage() {
 
       {/* 수락된 커플 */}
       {couple?.status === 'accepted' && partner ? (
-        <AcceptedView partner={partner} myProfile={myProfile} couple={couple} />
+        <>
+          <AcceptedView partner={partner} myProfile={myProfile} couple={couple} />
+          <div className="flex justify-center pb-8">
+            <button
+              onClick={() => setShowDissolveModal(true)}
+              className="text-xs text-[#C7C7CC] underline underline-offset-2"
+            >
+              커플 해제
+            </button>
+          </div>
+          <Modal open={showDissolveModal} onClose={() => setShowDissolveModal(false)}>
+            <div className="flex flex-col items-center gap-5 text-center">
+              <div className="text-5xl">💔</div>
+              <div>
+                <h3 className="text-lg font-bold text-[#1C1C1E] mb-1">정말 헤어질 건가요?</h3>
+                <p className="text-sm text-[#8E8E93]">
+                  커플 연결이 해제돼요.<br />데이트 기록은 그대로 남아있어요.
+                </p>
+              </div>
+              <div className="flex gap-3 w-full">
+                <Button variant="outline" size="md" className="flex-1" onClick={() => setShowDissolveModal(false)}>
+                  취소
+                </Button>
+                <Button
+                  variant="danger"
+                  size="md"
+                  className="flex-1"
+                  loading={actionLoading}
+                  onClick={() => handleAction(dissolveCouple, '커플이 해제됐어요')}
+                >
+                  해제하기
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        </>
       ) : couple?.status === 'pending' && myProfile && couple.requester_id === myProfile.id ? (
         /* 신청 보낸 상태 */
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] px-6 gap-6">

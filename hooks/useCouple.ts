@@ -15,6 +15,7 @@ interface UseCoupleReturn {
   acceptRequest: () => Promise<void>
   rejectRequest: () => Promise<void>
   cancelRequest: () => Promise<void>
+  dissolveCouple: () => Promise<void>
   refresh: () => void
 }
 
@@ -151,6 +152,16 @@ export function useCouple(): UseCoupleReturn {
     await fetchData()
   }
 
+  async function dissolveCouple() {
+    if (!couple) return
+    const { error } = await supabase
+      .from('couples')
+      .update({ status: 'dissolved', dissolved_at: new Date().toISOString() })
+      .eq('id', couple.id)
+    if (error) throw new Error('커플 해제에 실패했어요')
+    await fetchData()
+  }
+
   return {
     couple,
     partner,
@@ -161,6 +172,7 @@ export function useCouple(): UseCoupleReturn {
     acceptRequest,
     rejectRequest,
     cancelRequest,
+    dissolveCouple,
     refresh: fetchData,
   }
 }
